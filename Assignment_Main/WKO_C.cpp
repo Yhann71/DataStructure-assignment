@@ -297,8 +297,6 @@ SinglyLinkedList::~SinglyLinkedList() {
 
     void SinglyLinkedList::mergeSort(string sortKey) {
         head = sort(head, sortKey);
-        cout << "\nMerge Sort Result:" << endl;
-        cout << "List has been successfully sorted by " << sortKey << endl;
     }
 
     // ---------------------------------------------------------------
