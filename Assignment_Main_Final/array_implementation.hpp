@@ -399,22 +399,6 @@ int getAgeGroup(int& minAge, int& maxAge) {
 
 // ---------------- ANALYSIS ----------------
 void analysis() {
-
-    // Sorting Menu
-    cout << "\n===================\n";
-    cout << "Sorting Algorithms\n";
-    cout << "===================\n";
-    cout << "1. Insertion Sort\n";
-    cout << "Select: ";
-
-    int opt;
-    cin >> opt;
-
-    if (opt != 1) {
-        cout << "Invalid choice.\n";
-        return;
-    }
-
     auto start = high_resolution_clock::now();
 
     insertionSort();
