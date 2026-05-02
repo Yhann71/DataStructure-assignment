@@ -285,24 +285,6 @@ void sortByDistance() {
     }
 }
 
-int sortingMenu() {
-    int opt;
-
-    cout << "\n===================\n";
-    cout << "Sorting Algorithms\n";
-    cout << "===================\n";
-    cout << "1. Insertion Sort\n";
-    cout << "Select: ";
-    cin >> opt;
-
-    if (opt != 1) {
-        cout << "Invalid choice.\n";
-        return -1;
-    }
-
-    return opt;
-}
-
 // ---------------- INSERTION SORT ----------------
 void insertionSort() {
     for (int i = 1; i < sizeArr; i++) {
