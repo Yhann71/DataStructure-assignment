@@ -194,6 +194,14 @@ void binarySearchDistance(double threshold) {
     }
 }
 
+//-----------------Display Sort list-----
+void displaySortedList() {
+    displayHeader();
+    for (int i = 0; i < sizeArr; i++) {
+        printRow(arr[i]);
+    }
+}
+
 void sortByDistance() {
     for (int i = 1; i < sizeArr; i++) {
         Residents key = arr[i];
@@ -291,14 +299,6 @@ void searchMenu() {
     else {
         cout << "Invalid option.\n";
         return;
-    }
-}
-
-//-----------------Display Sort list-----
-void displaySortedList() {
-    displayHeader();
-    for (int i = 0; i < sizeArr; i++) {
-        printRow(arr[i]);
     }
 }
 
@@ -431,13 +431,30 @@ void analysis() {
     // ---------------- EXTRA MENU ----------------
     int choice;
     cout << "\n====================\n";
-    cout << "1. Display Sorted List\n";
-    cout << "2. Exit\n";
+    cout << "1. Display Sorted by Age\n";
+    cout << "2. Display Sorted by Mode\n";
+    cout << "3. Display Sorted by Distance\n";
+
     cout << "Select: ";
     cin >> choice;
 
     if (choice == 1) {
+        insertionSort(); 
         displaySortedList();
+    }
+    else if (choice == 2) {
+        sortByMode(); 
+        displaySortedList();
+    }
+    else if (choice == 3) {
+        sortByDistance(); 
+        displaySortedList();
+    }
+    else if (choice == 4) {
+        cout << "Exiting display menu...\n";
+    }
+    else {
+        cout << "Invalid choice\n";
     }
 }
 
