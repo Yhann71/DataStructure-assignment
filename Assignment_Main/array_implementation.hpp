@@ -202,15 +202,22 @@ void displaySortedList() {
     }
 }
 
-void sortByMode() {
+void sortByCarbon() {
     for (int i = 1; i < sizeArr; i++) {
         Residents key = arr[i];
         int j = i - 1;
 
-        while (j >= 0 && arr[j].mode > key.mode) {
+        double keyEmission = key.distance * key.factor * key.days;
+
+        while (j >= 0) {
+            double currEmission = arr[j].distance * arr[j].factor * arr[j].days;
+
+            if (currEmission <= keyEmission) break;
+
             arr[j + 1] = arr[j];
             j--;
         }
+
         arr[j + 1] = key;
     }
 }
@@ -445,7 +452,7 @@ void analysis() {
     int choice;
     cout << "\n====================\n";
     cout << "1. Display Sorted by Age\n";
-    cout << "2. Display Sorted by Mode\n";
+    cout << "Display Sorted by Carbon Emission\n";
     cout << "3. Display Sorted by Distance\n";
 
     cout << "Select: ";
@@ -456,7 +463,7 @@ void analysis() {
         displaySortedList();
     }
     else if (choice == 2) {
-        sortByMode(); 
+        sortByCarbon(); 
         displaySortedList();
     }
     else if (choice == 3) {
