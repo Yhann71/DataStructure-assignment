@@ -35,7 +35,7 @@ void binarySearchDistance(double threshold);
 
 // Sorting
 void insertionSort();
-void sortByMode();
+void sortByCarbon();
 void sortByDistance();
 
 // Analysis
