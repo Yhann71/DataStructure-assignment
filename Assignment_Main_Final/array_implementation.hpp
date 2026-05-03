@@ -144,6 +144,47 @@ void binarySearchAge(int target, double timeTaken) {
     cout << "Time Taken: " << timeTaken << " ms\n";
 }
 
+// Binary Search age group
+void binarySearchAgeGroup(int minAge, int maxAge, double timeTaken) {
+    int left = 0, right = sizeArr - 1;
+    int startIndex = -1;
+
+    // find first index >= minAge
+    while (left <= right) {
+        int mid = (left + right) / 2;
+
+        if (arr[mid].age >= minAge) {
+            startIndex = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    if (startIndex == -1 || arr[startIndex].age > maxAge) {
+        cout << "No record found.\n";
+        return;
+    }
+
+    displayHeader();
+
+    int count = 0;
+
+    for (int i = startIndex; i < sizeArr && arr[i].age <= maxAge; i++) {
+        printRow(arr[i]);
+        count++;
+    }
+
+    cout << "\n--- Memory Usage ---\n";
+    cout << "Elements (n): " << count << endl;
+    cout << "Memory Usage: " << count << " x " << sizeof(Residents)
+         << " bytes = " << count * sizeof(Residents) << " bytes\n";
+
+    cout << "\n--- Time Complexity (Binary Search) ---\n";
+    cout << "Time Complexity: O(log n)\n";
+    cout << "Time Taken: " << timeTaken << " ms\n";
+}
+
 // Binary Search Mode
 void binarySearchMode(string target, double timeTaken) {
     int left = 0, right = sizeArr - 1;
@@ -316,17 +357,47 @@ void searchMenu() {
     // ---------------- SEARCH ----------------
 
     if (opt == 1) {
-        cout << "Enter Age: ";
-        cin >> age;
 
-        insertionSort();
+        int subOpt;
 
-        auto start = high_resolution_clock::now();
+        cout << "\n1. Exact Age\n";
+        cout << "2. Age Group\n";
+        cout << "Select: ";
+        cin >> subOpt;
 
-        auto end = high_resolution_clock::now();
-        double timeTaken = duration<double, milli>(end - start).count();
+        insertionSort();   // must sort first
 
-        binarySearchAge(age, timeTaken);
+        if (subOpt == 1) {
+            int age;
+            cout << "Enter Age: ";
+            cin >> age;
+
+            auto start = high_resolution_clock::now();
+            auto end = high_resolution_clock::now();
+            double timeTaken = duration<double, milli>(end - start).count();
+
+            binarySearchAge(age, timeTaken);
+        }
+
+        else if (subOpt == 2) {
+            int minAge, maxAge;
+
+            int group = getAgeGroup(minAge, maxAge);
+            if (group == -1) {
+                cout << "Invalid age group\n";
+                return;
+            }
+
+            auto start = high_resolution_clock::now();
+            auto end = high_resolution_clock::now();
+            double timeTaken = duration<double, milli>(end - start).count();
+
+            binarySearchAgeGroup(minAge, maxAge, timeTaken);
+        }
+
+        else {
+            cout << "Invalid option\n";
+        }
     }
 
     else if (opt == 2) {
