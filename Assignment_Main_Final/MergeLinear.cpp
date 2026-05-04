@@ -1,4 +1,4 @@
-#include "MergeLinear_Header.hpp" // Pulls in all libraries, structs, and declarations!
+#include "MergeLinear.hpp" // Pulls in all libraries, structs, and declarations!
 
 // 1. Define Global Variables (No 'extern' here)
 Resident cityA[MAX];
