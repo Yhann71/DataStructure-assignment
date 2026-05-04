@@ -15,6 +15,9 @@ struct Residents {
     int days;
 };
 
+// main
+int binaryInsertion();
+
 // -------- GLOBAL --------
 extern Residents arr[1000];
 extern int sizeArr;
