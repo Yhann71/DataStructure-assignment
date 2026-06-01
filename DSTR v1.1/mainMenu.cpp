@@ -130,12 +130,8 @@ int main() {
                 if (activeOrder.orderID != -1) {
                     string itemID = activeOrder.itemID;
 
-                    ItemManagentMenu();
-
-                    // Task 4 searches for the item
                     searchItem(itemID);
 
-                    // Task 4 returns the shelf location
                     string locationID = getItemLocation(itemID);
 
                     cout << "\nLocation: " << locationID << endl;
@@ -150,7 +146,6 @@ int main() {
 
                 if (activeOrder.orderID != -1) {
 
-                    //  get shelf name from Task 4 
                     string locationID = getItemLocation(activeOrder.itemID);
                     if (!locationID.empty() && locationID.back() == '\r')
                         locationID.pop_back();
@@ -158,8 +153,6 @@ int main() {
                     cout << "\nItem ID  : " << activeOrder.itemID << endl;
                     cout << "Location : " << locationID << endl;
 
-                    // Task 5 runs BFS for fastest and shortest path using shelf name taken from Task 4
-                    // path is generated automatically
                     if (!locationID.empty())
                     {
                         string pathArray[10];
@@ -183,7 +176,6 @@ int main() {
                         cout << "\n  [Error] Item location not found in item list.\n";
                     }
 
-                    // open full Task 5 menu as normal
                     warehouse.runMenu();
                 }
                 break;
