@@ -4,19 +4,27 @@
 #include "ItemManagement.hpp"
 #include "OrderManagement.hpp"
 #include "RobotNav_PathTracking.hpp"
+#include "RobotAssignment.hpp" // 1. Dynamic linkage to Task 2 definitions
 
 using namespace std;
 
 int main() {
-    // 1. Initialize the shared memory queue
+    // Initialize the shared memory queue
     loadItems1();
     Queue masterOrderQueue;
     initQueue(masterOrderQueue);
 
-    // 2. Load persistent file records on startup
+    // 2. Initialize and Provision Custom Task 2 Robot Fleet Queue Memory
+    RobotQueue masterRobotQueue;
+    populateDefaultFleet(masterRobotQueue);
+
+    // Load persistent file records on startup
     loadPendingOrders(masterOrderQueue);
     Order activeOrder = {-1, "", "", "", ""}; 
     
+    // Maintain a persistent runtime string tracking which robot was assigned to the active order
+    string assignedRobot = ""; 
+
     WarehouseLayout warehouse;
     warehouse.buildWarehouse();
     NavigationSystem nav;
@@ -37,28 +45,21 @@ int main() {
 
         switch (choice) {
             case 1:
-                // Opens your interactive menu (Add orders, view queue)
+                // Opens interactive order menu (Add orders, view queue)
                 orderManagementMenu(masterOrderQueue);
                 break;
 
             case 2: 
-               
-                
                 // If we don't have an active order yet, pull one from the queue
                 if (activeOrder.orderID == -1) {
                     activeOrder = processOrder(masterOrderQueue);
                 }
 
-                
                 if (activeOrder.orderID != -1) {
-                    // YOU CAN DELETE THIS LINE BELOW - it's just a confirmation massage 
-                    // this is the how you get the orderID [ activeOrder.orderID ]
-                    cout << "Passing Order ID " << right << setw(4) << setfill('0') << activeOrder.orderID << " to Robot Assignment Module...\n"; 
-                    
-                    // function call here:
+                    // Open the interactive Robot Assignment Interface Submenu
+                    robotAssignmentMenu(masterRobotQueue, activeOrder);
                 }
                 break;
-            
 
             case 3: {
                 if (activeOrder.orderID == -1) {
@@ -66,21 +67,30 @@ int main() {
                 }
 
                 if (activeOrder.orderID != -1) {
-                    cout << "Task 3 — Robot Navigation & Path Tracking Module" << endl;
+                    cout << "\nTask 3 — Robot Navigation & Path Tracking Module" << endl;
                     
-                    //Mock Task 2 for now (until they finish their module)
-                    string assignedRobot = "R-01"; 
+                    // BRIDGING STEP A: Try to find an available robot automatically if one hasn't been locked yet
+                    if (assignedRobot.empty()) {
+                        cout << "Assigning a robot from the fleet sequence...\n";
+                        if (!assignRobotToOrder(masterRobotQueue, activeOrder.orderID, assignedRobot)) {
+                            cout << "[Alert] Navigation Aborted: Entire fleet is busy or undergoing maintenance!\n";
+                            break; // Exit case 3 safely back to main menu
+                        }
+                        cout << ">>> DEPLOYMENT SUCCESS: Assigned to [ " << assignedRobot << " ] <<<\n";
+                    } else {
+                        cout << "Using pre-allocated asset for this order: [ " << assignedRobot << " ]\n";
+                    }
 
-                    //Task 4 gets the shelf name based on the item ID
+                    // Task 4 gets the shelf name based on the item ID
                     string targetShelf = getItemLocation(activeOrder.itemID);
 
-                    //Task 5 generate path
+                    // Task 5 generate path
                     string rawPath[10];
                     int rawSize = 0;
                     warehouse.getPathArray(targetShelf, rawPath, rawSize);
 
                     if (rawSize > 0) {
-                        // 4. THE BRIDGE: Map Task 5 data to Task 3 struct
+                        // The Bridge: Map Task 5 data to Task 3 struct
                         int routeSteps = rawSize - 1; 
                         stepMovement* finalRoute = new stepMovement[routeSteps];
 
@@ -105,21 +115,27 @@ int main() {
                         // Convert orderID from int to string for Task 3
                         string orderIDStr = "ORD-" + to_string(activeOrder.orderID);
 
-                        // 5. Execute the Robot Path!
+                        // Execute the Robot Path!
                         nav.startPath(orderIDStr, assignedRobot, rawPath[1], rawPath[2], rawPath[3], "Pack-Station", finalRoute, routeSteps);
                         nav.returnPath();
 
-                        delete[] finalRoute; // Clean up memory
+                        delete[] finalRoute; // Clean up allocated memory
                         
-                        // 6. Mark order as complete
+                        // Mark order as complete in database
                         updateOrderStatus(activeOrder.orderID, activeOrder.itemID);
-                        activeOrder.orderID = -1; // Reset for the next order
+                        
+                        // BRIDGING STEP B: Release this specific robot back to "Available" pool
+                        releaseRobotFromTask(masterRobotQueue, assignedRobot);
+
+                        // Reset tracking variables for the next incoming order processing round
+                        activeOrder.orderID = -1; 
+                        assignedRobot = ""; 
                     } else {
                         cout << "Error: Task 5 could not find a path to " << targetShelf << endl;
                     }
                 } else {
                     cout << "\nNo pending orders to process." << endl;
-                    }
+                }
                 break;
             }
 
@@ -129,11 +145,8 @@ int main() {
                 }
                 if (activeOrder.orderID != -1) {
                     string itemID = activeOrder.itemID;
-
                     searchItem(itemID);
-
                     string locationID = getItemLocation(itemID);
-
                     cout << "\nLocation: " << locationID << endl;
                 }
                 break;
@@ -145,7 +158,6 @@ int main() {
                 }
 
                 if (activeOrder.orderID != -1) {
-
                     string locationID = getItemLocation(activeOrder.itemID);
                     if (!locationID.empty() && locationID.back() == '\r')
                         locationID.pop_back();
@@ -153,26 +165,20 @@ int main() {
                     cout << "\nItem ID  : " << activeOrder.itemID << endl;
                     cout << "Location : " << locationID << endl;
 
-                    if (!locationID.empty())
-                    {
+                    if (!locationID.empty()) {
                         string pathArray[10];
                         int    pathSize = 0;
 
                         warehouse.getPathArray(locationID, pathArray, pathSize);
 
-                        if (pathSize > 0)
-                        {
+                        if (pathSize > 0) {
                             cout << "\n  [Task 5] BFS Path to " << locationID << ":\n";
                             for (int i = 0; i < pathSize; i++)
                                 cout << "  Step " << (i + 1) << " : " << pathArray[i] << "\n";
-                        }
-                        else
-                        {
+                        } else {
                             cout << "\n  [Task 5] Shelf not found in warehouse tree.\n";
                         }
-                    }
-                    else
-                    {
+                    } else {
                         cout << "\n  [Error] Item location not found in item list.\n";
                     }
 
@@ -190,5 +196,5 @@ int main() {
         }
 
     } while (choice != 6);
-        return 0;
+    return 0;
 }
