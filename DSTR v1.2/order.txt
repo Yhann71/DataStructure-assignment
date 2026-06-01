@@ -1,0 +1,12 @@
+0001,wwww,I001,Keyboard,Completed
+0002,AAAAA,I001,Keyboard,Completed
+0003,qwqwq,I002,Mouse,Completed
+0004,QQQQ,I001,Keyboard,Completed
+0004,QQQQ,I002,Mouse,Completed
+0005,wewe,I001,Keyboard,Completed
+0006,test,I010,Power Bank,Completed
+0007,test2,I012,SSD Drive,Completed
+0008,test3,I006,Headset,Completed
+0009,test4,I003,Monitor,Completed
+0010,test5,I006,Headset,Completed
+0011,test6,I011,External Hard Drive,Completed

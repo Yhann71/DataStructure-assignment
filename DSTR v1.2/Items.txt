@@ -1,0 +1,12 @@
+I001,Keyboard,25,Shelf-A1-01
+I002,Mouse,40,Shelf-A1-02
+I003,Monitor,11,Shelf-A2-01
+I004,Laptop Stand,18,Shelf-A2-02
+I005,USB Cable,60,Shelf-B1-01
+I006,Headset,18,Shelf-B1-02
+I007,Webcam,15,Shelf-B2-01
+I008,Printer Paper,50,Shelf-B2-02
+I009,Ink Cartridge,22,Shelf-C1-01
+I010,Power Bank,27,Shelf-C1-02
+I011,External Hard Drive,9,Shelf-C2-01
+I012,SSD Drive,15,Shelf-C2-02
