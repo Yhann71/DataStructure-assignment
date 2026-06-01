@@ -4,7 +4,7 @@
 #include "ItemManagement.hpp"
 #include "OrderManagement.hpp"
 #include "RobotNav_PathTracking.hpp"
-#include "RobotAssignment.hpp" // 1. Dynamic linkage to Task 2 definitions
+#include "RobotAssignment.hpp" 
 
 using namespace std;
 
@@ -14,15 +14,13 @@ int main() {
     Queue masterOrderQueue;
     initQueue(masterOrderQueue);
 
-    // 2. Initialize and Provision Custom Task 2 Robot Fleet Queue Memory
+    // Initialize Task 2 Robot Fleet Queue Memory Structures
     RobotQueue masterRobotQueue;
     populateDefaultFleet(masterRobotQueue);
 
     // Load persistent file records on startup
     loadPendingOrders(masterOrderQueue);
     Order activeOrder = {-1, "", "", "", ""}; 
-    
-    // Maintain a persistent runtime string tracking which robot was assigned to the active order
     string assignedRobot = ""; 
 
     WarehouseLayout warehouse;
@@ -45,18 +43,14 @@ int main() {
 
         switch (choice) {
             case 1:
-                // Opens interactive order menu (Add orders, view queue)
                 orderManagementMenu(masterOrderQueue);
                 break;
 
             case 2: 
-                // If we don't have an active order yet, pull one from the queue
                 if (activeOrder.orderID == -1) {
                     activeOrder = processOrder(masterOrderQueue);
                 }
-
                 if (activeOrder.orderID != -1) {
-                    // Open the interactive Robot Assignment Interface Submenu
                     robotAssignmentMenu(masterRobotQueue, activeOrder);
                 }
                 break;
@@ -69,19 +63,18 @@ int main() {
                 if (activeOrder.orderID != -1) {
                     cout << "\nTask 3 — Robot Navigation & Path Tracking Module" << endl;
                     
-                    // BRIDGING STEP A: Try to find an available robot automatically if one hasn't been locked yet
+                    // Call live allocation tracking from Task 2 dynamically
                     if (assignedRobot.empty()) {
-                        cout << "Assigning a robot from the fleet sequence...\n";
+                        cout << "Assigning a robot from the fleet sequence front...\n";
                         if (!assignRobotToOrder(masterRobotQueue, activeOrder.orderID, assignedRobot)) {
-                            cout << "[Alert] Navigation Aborted: Entire fleet is busy or undergoing maintenance!\n";
-                            break; // Exit case 3 safely back to main menu
+                            cout << "[Alert] Navigation Aborted: Entire fleet is busy or offline!\n";
+                            break; 
                         }
                         cout << ">>> DEPLOYMENT SUCCESS: Assigned to [ " << assignedRobot << " ] <<<\n";
                     } else {
                         cout << "Using pre-allocated asset for this order: [ " << assignedRobot << " ]\n";
                     }
 
-                    // Task 4 gets the shelf name based on the item ID
                     string targetShelf = getItemLocation(activeOrder.itemID);
 
                     // Task 5 generate path
@@ -90,7 +83,6 @@ int main() {
                     warehouse.getPathArray(targetShelf, rawPath, rawSize);
 
                     if (rawSize > 0) {
-                        // The Bridge: Map Task 5 data to Task 3 struct
                         int routeSteps = rawSize - 1; 
                         stepMovement* finalRoute = new stepMovement[routeSteps];
 
@@ -112,22 +104,19 @@ int main() {
                             }
                         }
                         
-                        // Convert orderID from int to string for Task 3
                         string orderIDStr = "ORD-" + to_string(activeOrder.orderID);
 
-                        // Execute the Robot Path!
+                        // Execute the Stack-driven path journeys
                         nav.startPath(orderIDStr, assignedRobot, rawPath[1], rawPath[2], rawPath[3], "Pack-Station", finalRoute, routeSteps);
                         nav.returnPath();
 
-                        delete[] finalRoute; // Clean up allocated memory
+                        delete[] finalRoute; 
                         
-                        // Mark order as complete in database
                         updateOrderStatus(activeOrder.orderID, activeOrder.itemID);
                         
-                        // BRIDGING STEP B: Release this specific robot back to "Available" pool
+                        // Fire a complete release signal to Task 2 circular queue
                         releaseRobotFromTask(masterRobotQueue, assignedRobot);
 
-                        // Reset tracking variables for the next incoming order processing round
                         activeOrder.orderID = -1; 
                         assignedRobot = ""; 
                     } else {
@@ -151,7 +140,6 @@ int main() {
                 }
                 break;
             
-
             case 5:
                 if (activeOrder.orderID == -1) {
                     activeOrder = processOrder(masterOrderQueue);
