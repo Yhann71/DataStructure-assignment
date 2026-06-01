@@ -9,13 +9,14 @@ using namespace std;
 
 int main() {
     // 1. Initialize the shared memory queue
+    loadItems1();
     Queue masterOrderQueue;
     initQueue(masterOrderQueue);
 
     // 2. Load persistent file records on startup
     loadPendingOrders(masterOrderQueue);
     Order activeOrder = {-1, "", "", "", ""}; 
-
+    
     WarehouseLayout warehouse;
     warehouse.buildWarehouse();
     NavigationSystem nav;
@@ -126,20 +127,64 @@ int main() {
                 if (activeOrder.orderID == -1) {
                     activeOrder = processOrder(masterOrderQueue);
                 }
-
                 if (activeOrder.orderID != -1) {
-                    ItemManagentMenu();// YOU CAN DELETE THIS LINE BELOW - it's just a confirmation massage 
-                    // this is the how you get the orderID [ activeOrder.orderID ]
-                    cout << "Passing Item ID '" << activeOrder.itemID << "' to Item Search Module...\n";
-                    
+                    string itemID = activeOrder.itemID;
+
+                    ItemManagentMenu();
+
+                    // Task 4 searches for the item
+                    searchItem(itemID);
+
+                    // Task 4 returns the shelf location
+                    string locationID = getItemLocation(itemID);
+
+                    cout << "\nLocation: " << locationID << endl;
                 }
                 break;
             
 
-            case 5:{
-                warehouse.runMenu();
-                cout << "\n[Task 5 Execution] Warehouse Layout Module is under construction...\n";
-                
+            case 5:
+                if (activeOrder.orderID == -1) {
+                    activeOrder = processOrder(masterOrderQueue);
+                }
+
+                if (activeOrder.orderID != -1) {
+
+                    //  get shelf name from Task 4 
+                    string locationID = getItemLocation(activeOrder.itemID);
+                    if (!locationID.empty() && locationID.back() == '\r')
+                        locationID.pop_back();
+                    
+                    cout << "\nItem ID  : " << activeOrder.itemID << endl;
+                    cout << "Location : " << locationID << endl;
+
+                    // Task 5 runs BFS for fastest and shortest path using shelf name taken from Task 4
+                    // path is generated automatically
+                    if (!locationID.empty())
+                    {
+                        string pathArray[10];
+                        int    pathSize = 0;
+
+                        warehouse.getPathArray(locationID, pathArray, pathSize);
+
+                        if (pathSize > 0)
+                        {
+                            cout << "\n  [Task 5] BFS Path to " << locationID << ":\n";
+                            for (int i = 0; i < pathSize; i++)
+                                cout << "  Step " << (i + 1) << " : " << pathArray[i] << "\n";
+                        }
+                        else
+                        {
+                            cout << "\n  [Task 5] Shelf not found in warehouse tree.\n";
+                        }
+                    }
+                    else
+                    {
+                        cout << "\n  [Error] Item location not found in item list.\n";
+                    }
+
+                    // open full Task 5 menu as normal
+                    warehouse.runMenu();
                 }
                 break;
 
