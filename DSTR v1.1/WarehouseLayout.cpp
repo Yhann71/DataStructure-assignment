@@ -452,7 +452,7 @@ void WarehouseLayout::displayZoneContents(const string& zoneName) const
     printLine();
 }
 
-void WarehouseLayout::displayAisleContents(const string& aisleName) const
+void WarehouseLayout::displayAisleContent(const string& aisleName) const
 {
     printHeader("AISLE: " + aisleName);
     TreeNode* aisle = findNode(aisleName);
@@ -498,7 +498,7 @@ void WarehouseLayout::showAllLocations() const
     cout << "\n";
 }
 
-void WarehouseLayout::showZones() const
+void WarehouseLayout::showZone() const
 {
     cout << "\n  Zones available:\n";
     TreeNode* zone = (root ? root->left : nullptr);
@@ -623,7 +623,7 @@ void WarehouseLayout::runMenu()
             case 3:
             {
                 printHeader("VIEW ZONE CONTENTS");
-                showZones();
+                showZone();
                 cout << "\n  Enter zone name (e.g. zone-a): ";
                 string input;
                 getline(cin, input);
@@ -650,7 +650,7 @@ void WarehouseLayout::runMenu()
                 cout << "\n  Enter aisle name (e.g. aisle-b2): ";
                 string input;
                 getline(cin, input);
-                displayAisleContents(fixInput(input));
+                displayAisleContent(fixInput(input));
                 break;
             }
 
